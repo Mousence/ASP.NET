@@ -1,0 +1,73 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.EntityFrameworkCore;
+using ContosoUniversity.Data;
+using ContosoUniversity.Models;
+using Microsoft.Extensions.Configuration;
+using System.Configuration;
+
+namespace ContosoUniversity.Pages.Students
+{
+	public class IndexModel : PageModel
+	{
+		private readonly ContosoUniversity.Data.SchoolContext _context;
+		private readonly IConfiguration _configuration;
+		public IndexModel(ContosoUniversity.Data.SchoolContext context, IConfiguration configuration)
+		{
+			_context = context;
+			_configuration = configuration;
+		}
+		public string LastNameSort { get; set; }
+		public string FirstNameSort { get; set; }
+		public string DateSort { get; set; }
+		public string CurrentFilter { get; set; }
+		public string CurrentSort { get; set; }
+		public PaginatedList<Student> Students { get; set; }
+
+		//public IList<Student> Students { get; set; } = default!;
+
+		public async Task OnGetAsync(string sortOrder,string currentFilter, string searchString, int? pageIndex)
+		{
+			CurrentSort = sortOrder;
+
+			LastNameSort = String.IsNullOrEmpty(sortOrder) ? "last_name_desc" : "";  //Descinding by Name
+			FirstNameSort = sortOrder == "first_name_asc" ? "firs_name_desc" : "first_name_asc";
+			DateSort = sortOrder == "Date" ? "date_desc" : "Date";
+
+			if (searchString != null) pageIndex = 1;
+			else searchString = currentFilter;
+			
+			CurrentFilter = searchString;
+
+			IQueryable<Student> students = from s in _context.Students select s;
+
+			if (!String.IsNullOrEmpty(searchString))
+			{
+				students = students.Where
+					(
+							s => s.LastName.Contains(searchString)
+						|| s.FirstName.Contains(searchString)
+					);
+			}
+
+			switch (sortOrder)
+			{
+				default:			students = students.OrderBy(s => s.LastName);					break;
+				case "last_name_desc":	students = students.OrderByDescending(s => s.LastName);		break;
+				
+				case "first_name_asc":	students = students.OrderBy(s => s.FirstName);				break;
+				case "first_name_desc":	students = students.OrderByDescending(s => s.FirstName);	break;
+				
+				case "Date":		students = students.OrderBy(s => s.EnrollmentDate);				break;
+				case "dete_desc":	students = students.OrderByDescending(s => s.EnrollmentDate);	break;
+			}
+
+			int pageSize = ConfigurationBinder.GetValue("PageSize", 4);
+            //Students = await students.AsNoTracking().ToListAsync();
+        }
+	}
+}
