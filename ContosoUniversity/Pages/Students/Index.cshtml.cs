@@ -16,6 +16,7 @@ namespace ContosoUniversity.Pages.Students
 	{
 		private readonly ContosoUniversity.Data.SchoolContext _context;
 		private readonly IConfiguration _configuration;
+
 		public IndexModel(ContosoUniversity.Data.SchoolContext context, IConfiguration configuration)
 		{
 			_context = context;
@@ -26,11 +27,12 @@ namespace ContosoUniversity.Pages.Students
 		public string DateSort { get; set; }
 		public string CurrentFilter { get; set; }
 		public string CurrentSort { get; set; }
-		public PaginatedList<Student> Students { get; set; }
 
 		//public IList<Student> Students { get; set; } = default!;
+		public PaginatedList<Student> Students { get; set; }
 
-		public async Task OnGetAsync(string sortOrder,string currentFilter, string searchString, int? pageIndex)
+
+		public async Task OnGetAsync(string sortOrder, string currentFilter, string searchString, int? pageIndex)
 		{
 			CurrentSort = sortOrder;
 
@@ -38,9 +40,9 @@ namespace ContosoUniversity.Pages.Students
 			FirstNameSort = sortOrder == "first_name_asc" ? "firs_name_desc" : "first_name_asc";
 			DateSort = sortOrder == "Date" ? "date_desc" : "Date";
 
-			if (searchString != null) pageIndex = 1;
+			if(searchString != null)pageIndex = 1;
 			else searchString = currentFilter;
-			
+
 			CurrentFilter = searchString;
 
 			IQueryable<Student> students = from s in _context.Students select s;
@@ -65,9 +67,9 @@ namespace ContosoUniversity.Pages.Students
 				case "Date":		students = students.OrderBy(s => s.EnrollmentDate);				break;
 				case "dete_desc":	students = students.OrderByDescending(s => s.EnrollmentDate);	break;
 			}
-
-			int pageSize = ConfigurationBinder.GetValue("PageSize", 4);
-            //Students = await students.AsNoTracking().ToListAsync();
-        }
+			int pageSize = _configuration.GetValue("PageSize", 4);
+			Students = await PaginatedList<Student>.CreateAsync(students.AsNoTracking(), pageIndex ?? 1, pageSize);
+			//Students = await students.AsNoTracking().ToListAsync();
+		}
 	}
 }
