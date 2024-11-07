@@ -67,6 +67,7 @@ namespace ContosoUniversity.Pages.Students
 				case "Date":		students = students.OrderBy(s => s.EnrollmentDate);				break;
 				case "dete_desc":	students = students.OrderByDescending(s => s.EnrollmentDate);	break;
 			}
+
 			int pageSize = _configuration.GetValue("PageSize", 4);
 			Students = await PaginatedList<Student>.CreateAsync(students.AsNoTracking(), pageIndex ?? 1, pageSize);
 			//Students = await students.AsNoTracking().ToListAsync();
