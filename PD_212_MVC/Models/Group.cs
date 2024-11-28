@@ -6,7 +6,8 @@ namespace PD_212_MVC.Models
 	public class Group
 	{
 		[Key]
-		public required int group_id { get; set; }
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public required int group_id { get; set; }
 		[Required]
 		public required string group_name { get; set; }
 		[Required]

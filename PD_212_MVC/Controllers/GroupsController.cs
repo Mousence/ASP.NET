@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using PD_212_MVC.Data;
 using PD_212_MVC.Models;
 
-namespace PD_212_MVC.Views.Groups
+namespace PD_212_MVC.Controllers
 {
     public class GroupsController : Controller
     {
@@ -22,7 +22,7 @@ namespace PD_212_MVC.Views.Groups
         // GET: Groups
         public async Task<IActionResult> Index()
         {
-            var academyContext = _context.Groups.Include(d => d.Direction);
+            var academyContext = _context.Groups.Include(g => g.Direction);
             return View(await academyContext.ToListAsync());
         }
 
@@ -59,6 +59,7 @@ namespace PD_212_MVC.Views.Groups
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("group_id,group_name,direction")] Group @group)
         {
+            //group.Direction = await _context.Directions.Include(d => d.Groups).ThenInclude(g => g.Students).FirstOrDefaultAsync(d => d.direction_id == group.direction);
             if (ModelState.IsValid)
             {
                 _context.Add(@group);
