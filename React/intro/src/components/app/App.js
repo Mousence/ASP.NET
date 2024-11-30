@@ -7,6 +7,7 @@ import Article from '../article/Article';
 import Footer from '../footer/Footer';
 import Fibonacci from '../../fibonacci/Fibonacci';
 import data from '../article/db.json';
+import Switch from '../switch/Switch'
 
 function App() {
 
@@ -26,7 +27,8 @@ function App() {
       <Power a={2} n={8} />
       {/* <Fibonacci n={10}/> */}
       <Article db={data}/>
-      <Footer />
+      <Switch/>
+      <Footer year="2024"/>
     </div>
   );
 }
